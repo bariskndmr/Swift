@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import CoreLocation
 
 class WeatherViewController: UIViewController {
   
@@ -16,17 +17,25 @@ class WeatherViewController: UIViewController {
   @IBOutlet weak var searchTextField: UITextField!
   
   var weatherManager = WeatherManager()
+  var locationManager = CLLocationManager()
   
   override func viewDidLoad() {
     super.viewDidLoad()
+    weatherManager.delegate = self
+    searchTextField.delegate = self
+    // Delegate must be defined at the top (Before the methods)
+    locationManager.delegate = self
+    
+    locationManager.requestWhenInUseAuthorization()
+    locationManager.requestLocation()
     
     // textField should report back to ViewContoller
     // the main idea is textField can communicate what is going on to ViewController
-    weatherManager.delegate = self
-    searchTextField.delegate = self
+    
   }
   
 }
+
 
 // MARK: - UITextFieldDelegate
 
@@ -76,4 +85,20 @@ extension WeatherViewController: WeatherManagerDelegate {
   func didFailWithError(error: Error) {
     print(error)
   }
+}
+
+// MARK: - CLLocationManagerDelegate
+
+extension WeatherViewController: CLLocationManagerDelegate {
+  // Must use methods below
+  func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
+    print("error:: \(error.localizedDescription)")
+  }
+  
+  func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+    if locations.first != nil {
+      print("location:: \(locations[0])")
+    }
+  }
+  
 }
