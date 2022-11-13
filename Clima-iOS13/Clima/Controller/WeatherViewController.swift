@@ -33,6 +33,9 @@ class WeatherViewController: UIViewController {
     // the main idea is textField can communicate what is going on to ViewController
     
   }
+  @IBAction func findLocationButtonPressed(_ sender: UIButton) {
+    locationManager.requestLocation()
+  }
   
 }
 
@@ -64,6 +67,7 @@ extension WeatherViewController: UITextFieldDelegate {
     if let cityName = searchTextField.text{
       weatherManager.fetchWeather(cityName: cityName)
     }
+    textField.text = ""
   }
   
 }
@@ -90,14 +94,21 @@ extension WeatherViewController: WeatherManagerDelegate {
 // MARK: - CLLocationManagerDelegate
 
 extension WeatherViewController: CLLocationManagerDelegate {
+  
+  
   // Must use methods below
   func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
     print("error:: \(error.localizedDescription)")
   }
   
+  
+  
   func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-    if locations.first != nil {
-      print("location:: \(locations[0])")
+    if let location = locations.last {
+      locationManager.stopUpdatingLocation()
+      let lat = location.coordinate.latitude
+      let lon = location.coordinate.longitude
+      weatherManager.fetchWeather(latitude: lat, longtiude: lon)
     }
   }
   
